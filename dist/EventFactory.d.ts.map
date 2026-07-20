@@ -1,0 +1,1 @@
+{"version":3,"file":"EventFactory.d.ts","sourceRoot":"","sources":["../src/EventFactory.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,gBAAgB,EAAE,MAAM,mBAAmB,CAAC;AAC1D,OAAO,KAAK,EAAE,eAAe,EAAE,MAAM,mBAAmB,CAAC;AAKzD,qBAAa,YAAY;IACvB;;;;OAIG;IACH,MAAM,CAAC,WAAW,CAChB,SAAS,EAAE,MAAM,EACjB,MAAM,EAAE,gBAAgB,EACxB,OAAO,GAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAM,GACpC,eAAe;CAiBnB"}
