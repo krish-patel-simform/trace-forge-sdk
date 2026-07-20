@@ -5,6 +5,7 @@ declare class TraceForgeSDK {
     getConfig(): TraceForgeConfig;
     isInitialized(): boolean;
     trackPageView(payload?: Record<string, unknown>): void;
+    track(eventName: string, properties?: Record<string, unknown>): void;
 }
 export declare const TraceForge: TraceForgeSDK;
 export {};

@@ -1,10 +1,10 @@
 const SDK_VERSION = "1.0.0";
 export class EventFactory {
-    static createPageView(config, payload = {}) {
+    static createEvent(config, eventType, payload = {}) {
         return {
             eventId: crypto.randomUUID(),
             projectKey: config.projectKey,
-            eventType: "page_view",
+            eventType,
             timestamp: new Date().toISOString(),
             sdkVersion: SDK_VERSION,
             platform: "web",
@@ -16,6 +16,9 @@ export class EventFactory {
             },
             payload,
         };
+    }
+    static createPageView(config, payload = {}) {
+        return this.createEvent(config, "page_view", payload);
     }
 }
 //# sourceMappingURL=EventFactory.js.map

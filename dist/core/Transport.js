@@ -1,8 +1,8 @@
 // The SDK intrinsically knows its backend URL
-const API_URL = "http://localhost:3000";
+const API_URL = "http://localhost:4000";
 export class Transport {
     static async send(event) {
-        const response = await fetch(`${API_URL}/events`, {
+        const response = await fetch(`${API_URL}/api/events`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
