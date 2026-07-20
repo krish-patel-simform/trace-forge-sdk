@@ -5,6 +5,8 @@ class TraceForgeSDK {
 
   init(config: TraceForgeConfig) {
     this.config = config;
+    console.log("✅ TraceForge initialized");
+    console.log(this.config);
   }
 
   getConfig() {
