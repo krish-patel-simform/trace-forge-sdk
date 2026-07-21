@@ -27,6 +27,10 @@
   },
   "homepage": "https://github.com/krish-patel-simform/trace-forge-sdk#readme",
   "devDependencies": {
-    "@types/node": "^26.1.1"
+    "@types/node": "^26.1.1",
+    "@types/ua-parser-js": "^0.7.39"
+  },
+  "dependencies": {
+    "ua-parser-js": "^2.0.10"
   }
 }

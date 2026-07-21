@@ -4,6 +4,7 @@ import { Transport } from "./core/Transport.js";
 import { initClickTracking } from "./auto-capture/click.js";
 import { initScrollTracking } from "./auto-capture/scroll.js";
 import { initSearchTracking } from "./auto-capture/search.js";
+import { HeartbeatManager } from "./realtime/heartbeat.js";
 
 class TraceForgeSDK {
   private config: TraceForgeConfig | null = null;
@@ -30,7 +31,18 @@ class TraceForgeSDK {
     initScrollTracking();
     initSearchTracking();
 
+    HeartbeatManager.start();
+
     console.log("[TraceForge] Initialized ✅");
+  }
+
+  /**
+   * Shutdown the SDK, stopping heartbeats and cleaning up.
+   */
+  shutdown(): void {
+    HeartbeatManager.stop();
+    this.config = null;
+    console.log("[TraceForge] Shutdown 🛑");
   }
 
   getConfig(): TraceForgeConfig {

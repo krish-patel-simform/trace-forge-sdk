@@ -1,5 +1,7 @@
+import { UAParser } from "ua-parser-js";
 import type { TraceForgeConfig } from "../types/config.js";
 import type { TraceForgeEvent } from "../types/event.js";
+import { SessionManager } from "./SessionManager.js";
 
 const SDK_VERSION = "1.0.0";
 
@@ -16,8 +18,9 @@ export class EventFactory {
   static createEvent(
     config: TraceForgeConfig,
     eventType: string,
-    payload: Record<string, unknown> = {}
+    payload: Record<string, unknown> = {},
   ): TraceForgeEvent {
+    const sessionId = SessionManager.getSessionId();
     return {
       eventId: crypto.randomUUID(),
       projectKey: this.resolveProjectKey(config),
@@ -31,14 +34,25 @@ export class EventFactory {
         title: document.title,
         referrer: document.referrer,
       },
-      payload,
+      payload: { ...payload, sessionId },
     };
   }
 
   static createPageView(
     config: TraceForgeConfig,
-    payload: Record<string, unknown> = {}
+    payload: Record<string, unknown> = {},
   ): TraceForgeEvent {
-    return this.createEvent(config, "page_view", payload);
+    // Parse User Agent to extract Browser, OS, and Device
+    const parser = new UAParser();
+    const result = parser.getResult();
+
+    const enhancedPayload = {
+      ...payload,
+      browser: result.browser.name || "Unknown",
+      os: result.os.name || "Unknown",
+      deviceType: result.device.type || "Desktop",
+    };
+
+    return this.createEvent(config, "page_view", enhancedPayload);
   }
 }
