@@ -1,13 +1,12 @@
 import type { TraceForgeConfig } from "./types/config.js";
 import { EventFactory } from "./core/EventFactory.js";
 import { Transport } from "./core/Transport.js";
-import { initClickTracking } from "./auto-capture/click.js";
-import { initScrollTracking } from "./auto-capture/scroll.js";
-import { initSearchTracking } from "./auto-capture/search.js";
+
 import { HeartbeatManager } from "./realtime/heartbeat.js";
 
 class TraceForgeSDK {
   private config: TraceForgeConfig | null = null;
+  private searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
   /**
    * Initialize the SDK with your project's API key.
@@ -26,10 +25,7 @@ class TraceForgeSDK {
 
     this.config = config;
 
-    // Initialize auto-capture modules
-    initClickTracking();
-    initScrollTracking();
-    initSearchTracking();
+
 
     HeartbeatManager.start();
 
@@ -102,12 +98,64 @@ class TraceForgeSDK {
       return;
     }
 
+    let finalEventType = eventName;
+    let finalPayload = { ...properties };
+
+    if (!['page_view', 'click', 'scroll', 'search'].includes(eventName)) {
+      finalEventType = 'custom';
+      finalPayload.eventName = eventName;
+    }
+
     const config = this.getConfig();
-    const event = EventFactory.createEvent(config, eventName, properties);
+    const event = EventFactory.createEvent(config, finalEventType, finalPayload);
 
     Transport.send(event, config.apiKey).catch((err: unknown) => {
       console.error("[TraceForge] Transport error:", err);
     });
+  }
+
+  /**
+   * Track an explicit button or link click.
+   *
+   * @param elementName - The name of the element clicked.
+   * @param properties - Optional additional properties to attach to the event.
+   */
+  trackClick(elementName: string, properties: Record<string, unknown> = {}): void {
+    this.track('click', { ...properties, element: elementName, text: elementName, name: elementName });
+  }
+
+  /**
+   * Track scroll milestones.
+   *
+   * @param pageName - The name of the page being scrolled.
+   * @param depth - Number between 0 and 100 representing percentage scrolled.
+   * @param properties - Optional additional properties to attach to the event.
+   */
+  trackScroll(pageName: string, depth: number, properties: Record<string, unknown> = {}): void {
+    this.track('scroll', { ...properties, page: pageName, depth });
+  }
+
+  /**
+   * Track a search query, with built-in debouncing.
+   *
+   * @param query - The search query typed by the user.
+   * @param properties - Optional additional properties to attach to the event.
+   * @param delayMs - Debounce delay in milliseconds (default: 500).
+   */
+  trackSearch(query: string, properties: Record<string, unknown> = {}, delayMs: number = 500): void {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    
+    // Only track if the query is not purely whitespace
+    if (!query.trim()) {
+      return;
+    }
+
+    this.searchTimeout = setTimeout(() => {
+      this.track('search', { ...properties, query: query.trim() });
+      this.searchTimeout = null;
+    }, delayMs);
   }
 }
 
