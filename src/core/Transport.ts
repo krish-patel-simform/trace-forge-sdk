@@ -4,11 +4,17 @@ import type { TraceForgeEvent } from "../types/event.js";
 const API_URL = "http://localhost:4000";
 
 export class Transport {
-  static async send(event: TraceForgeEvent): Promise<void> {
+  /**
+   * Send a single event to the TraceForge ingestion endpoint.
+   * The `x-api-key` header authenticates the request against the server's
+   * SDK auth middleware, which resolves the owning Project from the key hash.
+   */
+  static async send(event: TraceForgeEvent, apiKey: string): Promise<void> {
     const response = await fetch(`${API_URL}/api/events`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-api-key": apiKey,
       },
       body: JSON.stringify(event),
     });
