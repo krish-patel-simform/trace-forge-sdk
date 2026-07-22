@@ -160,12 +160,19 @@ class TraceForgeSDK {
   }
 
   /**
-   * Identify a user with a unique user ID and optional traits/properties.
+   * Identify a user with a unique user ID and their traits.
    *
    * @param userId - Unique identifier for the user (e.g., database ID, email, username).
-   * @param traits - Optional properties describing the user (e.g., name, email, role).
+   * @param traits - User properties. `name` is **required** and is displayed in the dashboard.
+   *
+   * @example
+   * TraceForge.identify("usr_1001", {
+   *   name: "Alex Mercer",        // required
+   *   email: "alex@example.com",  // optional
+   *   role: "admin",              // optional – any extra trait
+   * });
    */
-  identify(userId: string, traits: UserTraits = {}): void {
+  identify(userId: string, traits: UserTraits): void {
     if (!this.isInitialized()) {
       console.warn(
         "[TraceForge] Cannot identify user before calling init().",
@@ -175,6 +182,11 @@ class TraceForgeSDK {
 
     if (!userId || typeof userId !== "string" || !userId.trim()) {
       console.warn("[TraceForge] identify() requires a valid non-empty userId string.");
+      return;
+    }
+
+    if (!traits.name || typeof traits.name !== "string" || !traits.name.trim()) {
+      console.warn("[TraceForge] identify() requires a non-empty \"name\" in traits. This is shown in the dashboard.");
       return;
     }
 
@@ -191,7 +203,7 @@ class TraceForgeSDK {
       console.error("[TraceForge] Transport error on identify:", err);
     });
 
-    console.log(`[TraceForge] Identified user: ${trimmedUserId}`);
+    console.log(`[TraceForge] Identified user: ${trimmedUserId} (name: "${traits.name}")`);
   }
 
   /**

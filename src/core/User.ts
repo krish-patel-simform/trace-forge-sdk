@@ -2,8 +2,17 @@ const USER_ID_KEY = '__tf_user_id__';
 const USER_TRAITS_KEY = '__tf_user_traits__';
 
 export interface UserTraits {
-  name?: string;
+  /**
+   * The display name of the user. **Required** — shown in the TraceForge dashboard.
+   */
+  name: string;
+  /**
+   * Optional email address of the user.
+   */
   email?: string;
+  /**
+   * Any additional custom properties to associate with this user.
+   */
   [key: string]: unknown;
 }
 
@@ -14,7 +23,7 @@ export interface UserTraits {
  */
 export class User {
   private static inMemoryUserId: string | null = null;
-  private static inMemoryTraits: UserTraits = {};
+  private static inMemoryTraits: UserTraits | null = null;
 
   /**
    * Get the current identified user ID, or null if unidentified.
@@ -30,7 +39,7 @@ export class User {
   /**
    * Get the current user traits.
    */
-  static getTraits(): UserTraits {
+  static getTraits(): UserTraits | null {
     try {
       const stored = localStorage.getItem(USER_TRAITS_KEY) || sessionStorage.getItem(USER_TRAITS_KEY);
       if (stored) {
@@ -43,12 +52,12 @@ export class User {
   }
 
   /**
-   * Store user ID and optional traits.
+   * Store user ID and traits.
    *
    * @param userId - Unique identifier for the user.
-   * @param traits - Optional user properties (e.g. name, email).
+   * @param traits - User properties including the required `name`.
    */
-  static identify(userId: string, traits: UserTraits = {}): void {
+  static identify(userId: string, traits: UserTraits): void {
     this.inMemoryUserId = userId;
     this.inMemoryTraits = { ...traits };
 
@@ -70,7 +79,7 @@ export class User {
    */
   static clear(): void {
     this.inMemoryUserId = null;
-    this.inMemoryTraits = {};
+    this.inMemoryTraits = null;
 
     try {
       localStorage.removeItem(USER_ID_KEY);
