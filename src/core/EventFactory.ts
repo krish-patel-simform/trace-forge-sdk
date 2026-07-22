@@ -2,6 +2,7 @@ import { UAParser } from "ua-parser-js";
 import type { TraceForgeConfig } from "../types/config.js";
 import type { TraceForgeEvent } from "../types/event.js";
 import { SessionManager } from "./SessionManager.js";
+import { Session } from "./Session.js";
 
 const SDK_VERSION = "1.0.0";
 
@@ -34,7 +35,11 @@ export class EventFactory {
         title: document.title,
         referrer: document.referrer,
       },
-      payload: { ...payload, sessionId },
+      // Inject sessionId first so callers can still override it if needed
+      payload: {
+        sessionId: Session.getId(),
+        ...payload,
+      },
     };
   }
 
