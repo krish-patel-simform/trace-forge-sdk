@@ -1,6 +1,7 @@
 import type { TraceForgeConfig } from "./types/config.js";
 import { EventFactory } from "./core/EventFactory.js";
 import { Transport } from "./core/Transport.js";
+import { User, type UserTraits } from "./core/User.js";
 
 import { HeartbeatManager } from "./realtime/heartbeat.js";
 
@@ -156,6 +157,56 @@ class TraceForgeSDK {
       this.track('search', { ...properties, query: query.trim() });
       this.searchTimeout = null;
     }, delayMs);
+  }
+
+  /**
+   * Identify a user with a unique user ID and optional traits/properties.
+   *
+   * @param userId - Unique identifier for the user (e.g., database ID, email, username).
+   * @param traits - Optional properties describing the user (e.g., name, email, role).
+   */
+  identify(userId: string, traits: UserTraits = {}): void {
+    if (!this.isInitialized()) {
+      console.warn(
+        "[TraceForge] Cannot identify user before calling init().",
+      );
+      return;
+    }
+
+    if (!userId || typeof userId !== "string" || !userId.trim()) {
+      console.warn("[TraceForge] identify() requires a valid non-empty userId string.");
+      return;
+    }
+
+    const trimmedUserId = userId.trim();
+    User.identify(trimmedUserId, traits);
+
+    const config = this.getConfig();
+    const event = EventFactory.createEvent(config, "identify", {
+      userId: trimmedUserId,
+      ...traits,
+    });
+
+    Transport.send(event, config.apiKey).catch((err: unknown) => {
+      console.error("[TraceForge] Transport error on identify:", err);
+    });
+
+    console.log(`[TraceForge] Identified user: ${trimmedUserId}`);
+  }
+
+  /**
+   * Reset current user identity (e.g., on user logout).
+   */
+  reset(): void {
+    User.clear();
+    console.log("[TraceForge] Reset user identity 🔄");
+  }
+
+  /**
+   * Get current identified user ID, or null if unidentified.
+   */
+  getUserId(): string | null {
+    return User.getId();
   }
 }
 

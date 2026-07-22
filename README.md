@@ -22,5 +22,16 @@ TraceForge.init({
 ## Usage
 
 ```typescript
+// Track custom events
 TraceForge.track("click", { button: "checkout" });
+
+// Identify user with unique ID and properties (e.g. name, email)
+TraceForge.identify("usr_1001", {
+  name: "Alex Mercer",
+  email: "alex@example.com",
+  role: "admin",
+});
+
+// Reset user identity on logout
+TraceForge.reset();
 ```
