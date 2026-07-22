@@ -1,7 +1,9 @@
 import type { TraceForgeEvent } from "../types/event.js";
 
 // The SDK intrinsically knows its backend URL
-const API_URL = "http://localhost:4000";
+// const API_URL = "http://localhost:4000";
+
+const API_URL = "https://trace-forge-backend.onrender.com";
 
 export class Transport {
   /**
