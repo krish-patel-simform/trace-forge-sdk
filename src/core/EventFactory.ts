@@ -50,6 +50,7 @@ export class EventFactory {
 
   static createPageView(
     config: TraceForgeConfig,
+    pageName: string,
     payload: Record<string, unknown> = {},
   ): TraceForgeEvent {
     // Parse User Agent to extract Browser, OS, and Device
@@ -58,6 +59,7 @@ export class EventFactory {
 
     const enhancedPayload = {
       ...payload,
+      pageName,
       browser: result.browser.name || "Unknown",
       os: result.os.name || "Unknown",
       deviceType: result.device.type || "Desktop",

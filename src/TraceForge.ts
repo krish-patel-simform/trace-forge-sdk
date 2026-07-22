@@ -59,9 +59,10 @@ class TraceForgeSDK {
    * Track a page view event.
    * Call this on route changes in SPAs, or once on page load.
    *
+   * @param pageName - The name of the page being viewed.
    * @param payload - Optional additional properties to attach to the event.
    */
-  trackPageView(payload: Record<string, unknown> = {}): void {
+  trackPageView(pageName: string, payload: Record<string, unknown> = {}): void {
     if (!this.isInitialized()) {
       console.warn(
         "[TraceForge] Cannot track page view before calling init().",
@@ -70,7 +71,7 @@ class TraceForgeSDK {
     }
 
     const config = this.getConfig();
-    const event = EventFactory.createPageView(config, payload);
+    const event = EventFactory.createPageView(config, pageName, payload);
 
     Transport.send(event, config.apiKey).catch((err: unknown) => {
       console.error("[TraceForge] Transport error:", err);
