@@ -25,9 +25,15 @@ export class EventFactory {
     const sessionId = SessionManager.getSessionId();
     const userId = User.getId();
 
+    const parser = new UAParser();
+    const result = parser.getResult();
+
     const mergedPayload: Record<string, unknown> = {
       sessionId: Session.getId(),
       ...(userId ? { userId } : {}),
+      browser: result.browser.name || "Unknown",
+      os: result.os.name || "Unknown",
+      deviceType: result.device.type || "Desktop",
       ...payload,
     };
 
@@ -53,16 +59,9 @@ export class EventFactory {
     pageName: string,
     payload: Record<string, unknown> = {},
   ): TraceForgeEvent {
-    // Parse User Agent to extract Browser, OS, and Device
-    const parser = new UAParser();
-    const result = parser.getResult();
-
     const enhancedPayload = {
       ...payload,
       pageName,
-      browser: result.browser.name || "Unknown",
-      os: result.os.name || "Unknown",
-      deviceType: result.device.type || "Desktop",
     };
 
     return this.createEvent(config, "page_view", enhancedPayload);
